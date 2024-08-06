@@ -225,9 +225,14 @@ class AlgoBot():
                 self.cancel_order(qnt,buy)
             self.set_leverage()
             id=self.place_order(buy)
+            if id:
+                return True
+            else:
+                return False
         except Exception as e:
             print(f'Ошибка при открытии ордера \n {e}\n'
                   f'line 229')
+            return False
 
     async def start_trade(self,state:FSMContext,message : Message):
         self.last_date = '2024'
@@ -235,25 +240,29 @@ class AlgoBot():
         while state_cur=='Main:RUN':
             try:
                 df = self.get_data()
+                if df.empty:
+                    await asyncio.sleep(5)
+                    continue
                 if self.last_date!=df.index[-1]:
                     self.last_date = df.index[-1]
-                    df = df[:-1]
                     sgnl = self.signal(df)
                     if sgnl==1:
                         #print(self.position()['side'])
                         if self.position()['side']=="Buy":
                             continue
-                        self.open_order(buy=True)
-                        await message.answer(text=f"INFO SIGNAL: SUCCES \nBuy(LONG) {self.coin} with price {df['Close'][-1]} Time: {self.last_date}")
-                        self.last_date = df.index[-1]
+                        flag=self.open_order(buy=True)
+                        if flag:
+                            await message.answer(text=f"Покупка {self.coin} По цене {df['Close'][-1]} \nВремя: {self.last_date}")
+                            self.last_date = df.index[-1]
 
                     elif sgnl==-1:
                         #print(self.position()['side'])
                         if self.position()['side']=="Sell":
                             continue
-                        self.open_order(buy=False)
-                        await message.answer(text=(f"INFO SIGNAL: SUCCES \nSell(SHORT) {self.coin} with price {df['Close'][-1]} Time: {self.last_date}"))
-                        self.last_date = df.index[-1]
+                        flag=self.open_order(buy=False)
+                        if flag:
+                            await message.answer(text=(f"Продажа {self.coin} по цене {df['Close'][-1]} \nВремя: {self.last_date}"))
+                            self.last_date = df.index[-1]
                 await asyncio.sleep(10)
                 state_cur= await state.get_state()
             except Exception as e:

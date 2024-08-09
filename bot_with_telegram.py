@@ -45,6 +45,8 @@ class AlgoBot():
         self.prc_step = 0.0
         self.key_value = int(self.data['key_value'])
         self.atr_period=int(self.data['atr'])
+        self.tp_percent=int(self.data['tp'])
+        self.sl_percent=int(self.data['sl'])
         self.usd=float(self.data['bal'])
 
     def heikin_ashi(self,df):
@@ -146,7 +148,35 @@ class AlgoBot():
         quantity = Decimal(str(quantity))
         return float(quantity - quantity % Decimal(str(step_size)))
 
+    def take_stop(self,buy=False):
+        price = self.get_last_price()
+        qnt = float(self.round_step_size(float(self.usd) / float(price) * float(self.leverage), self.qty_step))
+        if buy:
+            tp_price = self.round_step_size(price * (1 + float(self.tp_percent) / 100), self.prc_step)
+            sl_price=self.round_step_size(price * (1 - float(self.sl_percent) / 100), self.prc_step)
+        else:
+            tp_price = self.round_step_size(price * (1 - float(self.tp_percent) / 100), self.prc_step)
+            sl_price=self.round_step_size(price * (1 + float(self.sl_percent) / 100), self.prc_step)
 
+
+        try:
+            self.session.set_trading_stop(
+                category="linear",
+                symbol=self.coin,
+                tpslMode="Partial",
+                takeProfit=tp_price,
+                tpOrderType="Market",
+                tpSize=str(qnt),
+
+                stopLoss=sl_price,
+                slOrderType="Market",
+                slSize=str(qnt),
+                positionIdx=0,
+            )
+
+            return
+        except Exception as e:
+            pass
     def place_order(self,buy):
         #usd_for_order=self.get_balance()
         usd_for_order=self.usd
@@ -250,6 +280,7 @@ class AlgoBot():
                             continue
                         flag=self.open_order(buy=True)
                         if flag:
+                            self.take_stop(True)
                             await message.answer(text=f"Покупка {self.coin} По цене {df['Close'][-1]} \nВремя: {self.last_date}")
                             self.last_date = df.index[-1]
 
@@ -259,6 +290,7 @@ class AlgoBot():
                             continue
                         flag=self.open_order(buy=False)
                         if flag:
+                            self.take_stop(False)
                             await message.answer(text=(f"Продажа {self.coin} по цене {df['Close'][-1]} \nВремя: {self.last_date}"))
                             self.last_date = df.index[-1]
                 await asyncio.sleep(10)

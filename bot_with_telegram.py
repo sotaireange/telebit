@@ -167,7 +167,7 @@ class AlgoBot():
             )['result']['orderId']
             return True
         except Exception as e:
-            logging.exception("Не удалось исполнить ордер")
+            logging.error("Не удалось исполнить ордер")
             time.sleep(2)
             return False
 
@@ -189,8 +189,7 @@ class AlgoBot():
                 return position
             except Exception as e:
                 time.sleep(2)
-                print(f'{e}'
-                      f'line 192' )
+                logging.error(f'{e} line 192')
                 self.session = self.create_session()
 
     def cancel_order(self,qnt,buy):
@@ -212,7 +211,7 @@ class AlgoBot():
                 return
             except Exception as e:
                 time.sleep(2)
-                print(e, "line 214")
+                logging.error(f'{e} line 214')
                 self.session = self.create_session()
 
     def open_order(self,buy):
@@ -230,8 +229,8 @@ class AlgoBot():
             else:
                 return False
         except Exception as e:
-            print(f'Ошибка при открытии ордера \n {e}\n'
-                  f'line 229')
+            logging.error(f'{e} line 233')
+
             return False
 
     async def start_trade(self,state:FSMContext,message : Message):
@@ -244,7 +243,6 @@ class AlgoBot():
                     await asyncio.sleep(5)
                     continue
                 if self.last_date!=df.index[-1]:
-                    self.last_date = df.index[-1]
                     sgnl = self.signal(df)
                     if sgnl==1:
                         #print(self.position()['side'])

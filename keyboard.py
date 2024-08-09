@@ -14,6 +14,9 @@ def main_keyboard():
     markup.row(types.InlineKeyboardButton(text='ATR Period', callback_data='atr'))
     markup.row(types.InlineKeyboardButton(text='Balance', callback_data='bal'))
     markup.row(types.InlineKeyboardButton(text='Leverage', callback_data='leverage'))
+    markup.row(types.InlineKeyboardButton(text='Тейк-Профит',callback_data='tp'))
+    markup.row(types.InlineKeyboardButton(text='Стоп-Лосс',callback_data='sl'))
+
     return markup.as_markup()
 
 

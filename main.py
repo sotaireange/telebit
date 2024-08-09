@@ -16,8 +16,8 @@ logging.captureWarnings(False)
 
 async def main():
     try:
-        bot = Bot(os.getenv("BOT_TOKEN"))
-        redis = Redis(host=os.getenv('REDIS_HOST','localhost'), port=6379, db=0, password=os.getenv('REDIS_PASSWORD'),decode_responses=True)
+        bot = Bot(os.getenv("BOT_TOKEN",'7426379906:AAEtlBFa6Irkz0OJjgHYK63NCw81Zud0H3w'))
+        redis = Redis(host=os.getenv('REDIS_HOST','localhost'), port=6379, db=2, password=os.getenv('REDIS_PASSWORD'),decode_responses=True)
         redis_storage=RedisStorage(redis=redis)
         dp = Dispatcher(storage=redis_storage)
         dp.include_router(router)

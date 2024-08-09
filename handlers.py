@@ -28,13 +28,21 @@ async def get_text(state:FSMContext):
     coin=data.get('coin',"---")
     bal=data.get('bal',"---")
     leverage=data.get('leverage',"---")
+    time_frame=data.get('time_frame',"---")
+    tp=data.get('tp','---')
+    sl=data.get('sl','---')
+
     text=(f'API - <{api}>\n'
           f'Secret - <{secret}>\n'
           f'COIN - <{coin}>\n'
+          f'Time Frame - <{time_frame}>\n'
           f'ATR Period- <{atr}>\n'
           f'Key Value - <{key_value}>\n'
           f'Balance - <{bal}>\n'
-          f'Leverage - <{leverage}>')
+          f'Leverage - <{leverage}>\n'
+          f'Тейк Профит - <{tp}>\n'
+          f'Стоп Лосс - <{sl}>')
+
     return text
 
 

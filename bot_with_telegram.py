@@ -93,7 +93,7 @@ class AlgoBot():
             (src < df['xATRTrailingStop']) & df['below']
         ]
         df['signal']=np.select(conditions, [1,-1],default=0)
-        return df['signal'].iloc[-1]
+        return df['signal'].iloc[-2]
 
 
     def create_session(self):
@@ -105,10 +105,6 @@ class AlgoBot():
         return session
 
 
-    def get_balance(self):
-        balance=self.session.get_wallet_balance(accountType='UNIFIED')['result']['list'][0]['totalAvailableBalance']
-        balance=float(balance)*0.95
-        return balance
 
     def get_last_price(self):
         info = self.session.get_tickers(category='linear', symbol=self.coin)
@@ -296,7 +292,7 @@ class AlgoBot():
                 await asyncio.sleep(10)
                 state_cur= await state.get_state()
             except Exception as e:
-                logging.exception(f"Ошибка {self.coin}\n 252 LINE")
+                logging.error(f"Ошибка {self.coin}\n 252 LINE")
 
 
 

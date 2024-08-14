@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.state import State, StatesGroup
 import asyncio
 from keyboard import main_keyboard,run_keyboard
-from binance_bot import AlgoBot
+from bot_with_telegram import AlgoBot
 
 class Main(StatesGroup):
     RUN = State()

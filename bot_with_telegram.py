@@ -45,17 +45,19 @@ class AlgoBot():
         self.prc_step = 0.0
         self.key_value = int(self.data['key_value'])
         self.atr_period=int(self.data['atr'])
-        self.tp_percent=int(self.data['tp'])
-        self.sl_percent=int(self.data['sl'])
+        self.tp_percent=float(self.data['tp'])
+        self.sl_percent=float(self.data['sl'])
         self.usd=float(self.data['bal'])
+        self.hiken_ashi=int(self.data.get('hiken_ashi',0))
+
 
     def heikin_ashi(self,df):
-        ha_df = df.copy()
-        ha_df['Close'] = (df['Open'] + df['High'] + df['Low'] + df['Close']) / 4
-        ha_df['Open'] = (df['Open'].shift(1) + df['Close'].shift(1)) / 2
-        ha_df['High'] = df[['Open', 'Close', 'High']].max(axis=1)
-        ha_df['Low'] = df[['Open', 'Close', 'Low']].min(axis=1)
-        return ha_df
+            ha_df = df.copy()
+            ha_df['Close'] = (df['Open'] + df['High'] + df['Low'] + df['Close']) / 4
+            ha_df['Open'] = (df['Open'].shift(1) + df['Close'].shift(1)) / 2
+            ha_df['High'] = df[['Open', 'Close', 'High']].max(axis=1)
+            ha_df['Low'] = df[['Open', 'Close', 'Low']].min(axis=1)
+            return ha_df
 
     def signal(self,df):
         src = df['Close']
@@ -268,6 +270,8 @@ class AlgoBot():
                 if df.empty:
                     await asyncio.sleep(5)
                     continue
+                if self.hiken_ashi:
+                    df=self.heikin_ashi(df)
                 if self.last_date!=df.index[-1]:
                     sgnl = self.signal(df)
                     if sgnl==1:
